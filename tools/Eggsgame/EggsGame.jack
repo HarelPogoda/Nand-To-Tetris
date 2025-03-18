@@ -1,0 +1,196 @@
+class EggsGame {
+    field Array eggsGame;
+    field Arrow arrow;
+    field Xiks xiks;
+    field int countFallen, countPopped;
+    field boolean isGameOver, isFailed;
+
+    constructor EggsGame new() {
+        let isGameOver = false;
+        let isFailed = false;
+        let countFallen = 0;
+        let countPopped = 0;
+         
+        
+        let xiks = Xiks.new();
+        let arrow = Arrow.new();
+
+        let eggsGame = Array.new(5);
+        let eggsGame[0] = Egg.new(60, 60, 20);
+        let eggsGame[1] = Egg.new(140, 75, 25);
+        let eggsGame[2] = Egg.new(220, 55, 22);
+        let eggsGame[3] = Egg.new(300, 65, 18);
+        let eggsGame[4] = Egg.new(380, 60, 20);
+
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void disposeAll() {
+        var int counter;
+        var Egg egg;  // Declare a variable to hold each Egg object
+        let counter=0;  
+        while (counter < 5) {
+            let egg = eggsGame[counter];  // Properly access array element
+            do egg.dispose();
+            let counter = counter + 1;
+        }
+
+        do arrow.dispose();
+        do xiks.dispose();
+        do dispose(); //dispose game object itself
+        return;
+    }
+
+    method void endGame() {
+        var int counter;
+        let counter = 0;
+
+        if (~isFailed) {  
+            do Output.printString("GAME OVER! YOU WON!");
+            do Output.println();
+        } else {
+            do Output.printString("GAME OVER! YOU FAILED!");
+            do Output.println();
+        }
+        do disposeAll();
+        return;
+    }
+
+    method void endGame_in_the_middle(){
+        do Output.printString("WHY STOP IN THE MIDDLE?");
+        do Output.println();
+        do disposeAll();
+        return;
+    }
+
+    method void keyPressed() {
+        var char key;
+        let key = Keyboard.keyPressed();
+
+        if (key = 81) {  // Q key
+            let isGameOver = true;
+        } 
+        if (key = 132) {  // Right arrow
+            do arrow.move_right();
+        } 
+        if (key = 130) {  // Left arrow
+            do arrow.move_left();
+        } 
+        if (key = 128) {  // Enter key
+            do arrow.shoot();
+            do checkCollisionHere(arrow.getX(),arrow.getY());
+            do Sys.wait(100);  // Small delay
+            do arrow.initialize();  // Reset arrow
+        }
+        return;
+    }
+
+    method void removeXiks() {
+        do xiks.erase();
+	if(xiks.getNumberLives()=0){
+	    let isFailed=true;
+            let isGameOver=true;
+	    do Output.printString("You missed one!");
+            do Output.println();
+            do endGame();
+        }
+        return;
+    }
+
+
+    method bool checkCollisionHere(int arrowX, int arrowY){
+        var Egg egg;
+        var int counter;
+        let counter=0;
+        while(counter<5){
+            let egg=eggsGame[counter];
+            if(egg.isEggShot(arrowX, arrowY)){
+                let countPopped = countPopped + 1;
+                do Output.printString("egg is popped");
+                do Output.println();
+                //do egg.erase();
+                return true;
+            }
+            let counter=counter+1;
+        }
+        return false;
+    }
+
+
+
+    method void run() {
+        var boolean continueGame;  
+        // A variable to store if we should continue the game loop
+        var int i;
+        var Egg egg;
+        var int arrowX, arrowY;
+        // (countPopped+countFallen)=5 this means game over,eggs finished
+        let continueGame = (~isGameOver) & (countFallen < 5) & (countPopped < 5) & ((countPopped+countFallen)<5);
+
+
+        while (continueGame) {
+            let i = 0;
+
+            while (i < 5) {
+                do keyPressed();
+
+                if (isGameOver) {
+                    do endGame_in_the_middle();
+                    return;
+                }
+
+                let arrowX = arrow.getX();
+                let arrowY = arrow.getY();
+
+                let egg = eggsGame[i];
+
+                if (egg.isFallen() & (~egg.getStopped())) {
+                    do egg.setStopped();
+                    do Output.printString("you missed one!");
+                    do Output.println();
+
+                    do removeXiks();
+                    let countFallen = countFallen + 1;
+                }
+                
+                if (~egg.isEggShot(arrowX, arrowY) & ~egg.isFallen()) {
+                    do egg.playEgg();
+                    //do Output.printString("i play egg");
+                    //do Output.println();
+                }
+
+                
+                //do Sys.wait(50);
+                let i = i + 1;
+            }
+
+
+            //do Sys.wait(50);
+
+            // Re-evaluate `continueGame` at the end of each iteration
+            let continueGame = (~isGameOver) & (countFallen < 5) & (countPopped < 5) & ((countPopped+countFallen)<5);
+        }
+         
+        // for debuging:
+        //do Output.printString("countFallen: ");
+        //do Output.printInt(countFallen);  
+        //do Output.println();
+
+        //do Output.printString("countPopped: ");
+        //do Output.printInt(countPopped);  
+        //do Output.println();
+
+
+        //do Output.printString("i ended here");
+        //do Output.println();
+
+        do endGame();
+        return;
+    }
+
+}

@@ -1,0 +1,53 @@
+class Xiks {
+
+    field int number_of_lives;
+    static int co;
+
+    constructor Xiks new() {
+	do Output.moveCursor(0,0);  // Move cursor to top-left corner
+        do Output.printString("lives:");  
+        do Output.println();
+
+        let number_of_lives = 5;   // Use 'let' for initialization
+        do draw_xiks();            // Use 'do' for method calls
+        return this;
+    }
+
+    method void erase() {
+        let number_of_lives= number_of_lives - 1;  
+        // Use 'let' for modifying fields
+        do draw_xiks();
+        return;
+    }
+
+
+    method int getNumberLives(){
+    	return number_of_lives;
+    }
+
+
+    method void draw_xiks() {
+        do init_lives_drawing();
+	do draw();
+        return;
+    }
+
+    method void init_lives_drawing() {
+        do Output.moveCursor(0,7);  
+        do Output.printString("   ");  // This will overwrite the number
+        do Output.println();
+        return;
+    }
+
+    method void draw() {
+        do Output.moveCursor(0,7); 
+        do Output.printInt(number_of_lives);
+        do Output.println();
+        return;
+    }
+
+       method void dispose() {
+        do Memory.deAlloc(this);  // Deallocate the Xiks object
+        return;
+    }
+}

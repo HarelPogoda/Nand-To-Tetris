@@ -1,0 +1,249 @@
+class EggsGame {
+    field Array eggsGame;
+    field Xiks xiks;
+    field int countFallen, countPopped;
+    field boolean isGameOver, isFailed;
+    //var Object weapon; only in Java or Python!! Not in Jack!!
+   
+    field Weapon weapon;
+    field int weaponType;
+
+    constructor EggsGame new(int weaponTyp) {
+
+        let weapon = Weapon.new(weaponTyp); // create the weapon based on type
+	let weaponType = weaponTyp;
+
+        let isGameOver = false;
+        let isFailed = false;
+        let countFallen = 0;
+        let countPopped = 0;
+         
+        
+        let xiks = Xiks.new();
+
+     	let eggsGame = Array.new(10); // 10 eggs in eggsGame array
+
+	// Placing 5 smaller eggs with valid coordinates
+	let eggsGame[0] = Egg.new(60, 60, 15);   // Smaller egg, radius = 15
+	let eggsGame[1] = Egg.new(140, 50, 18);  // Slightly larger egg, radius = 18
+	let eggsGame[2] = Egg.new(220, 55, 12);  // Smaller egg, radius = 12
+	let eggsGame[3] = Egg.new(300, 65, 14);  // Slightly smaller egg, radius = 14
+	let eggsGame[4] = Egg.new(380, 60, 16);  // Medium egg, radius = 16
+
+	// Adding 5 more eggs with valid positions, but 3 of them smaller
+	let eggsGame[5] = Egg.new(460, 80, 12);  // Smaller egg, radius = 12
+	let eggsGame[6] = Egg.new(120, 95, 16);  // Medium egg, radius = 16 (moved to valid x range)
+	let eggsGame[7] = Egg.new(260, 100, 14);  // Fixed position, smaller egg, radius = 14
+	let eggsGame[8] = Egg.new(440, 150, 18);  // Medium egg, radius = 18 (moved to valid x range)
+	let eggsGame[9] = Egg.new(400, 120, 19);  // Medium egg, radius = 19 (moved to valid x range)
+
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+
+
+    method void endGame_in_the_middle(){
+        do Output.printString("WHY STOP IN THE MIDDLE?");
+        do Output.println();
+        do disposeAll();
+        return;
+    }
+
+
+
+    method void disposeAll() {
+        var int counter;
+        var Egg egg;  // Declare a variable to hold each Egg object
+        let counter=0;  
+        while (counter < 10) {
+            let egg = eggsGame[counter];  // Properly access array element
+            do egg.dispose();
+            let counter = counter + 1;
+        }
+
+        do weapon.dispose();
+        do xiks.dispose();
+        do dispose(); //dispose game object itself
+        return;
+    }
+
+
+    method void endGame() {
+	if (countFallen < 5){
+	    let isFailed=false;
+	}
+	else{
+	    let isFailed=true;
+	}
+        do disposeAll();
+	return;
+    }
+
+
+    method void clearScreen() {
+        do Screen.clearScreen(); // Clears all graphics and text from the screen
+        return;
+    }
+
+
+    method bool getIsFailed() {
+	return isFailed;
+    }
+
+
+    method void keyPressed() {
+        var char key;
+        let key = Keyboard.keyPressed();
+
+        if (key = 113) {  // Q key
+            let isGameOver = true;
+	    do endGame_in_the_middle();
+	    return;
+        } 
+        if (key = 132) {  // Right arrow
+            do weapon.move_right();
+        } 
+        if (key = 130) {  // Left arrow
+            do weapon.move_left();
+        } 
+        if (key = 128) {  // Enter key
+            do weapon.shoot();
+            do checkCollisionHere();
+            do Sys.wait(50);  // Small delay
+            do weapon.initialize();  // Reset weapon (also isShot = false)
+        }
+        return;
+    }
+
+    method void removeXiks() {
+        do xiks.erase();
+	if(xiks.getNumberLives()=0){
+	    let isFailed=true;
+            let isGameOver=true;
+	    do Output.printString("You missed one!");
+            do Output.println();
+            do endGame();
+        }
+        return;
+    }
+
+
+
+
+    method bool checkCollisionWithEgg(Egg egg) {
+    	var boolean isStopped;
+    	let isStopped = egg.getStopped();
+
+    	if ((~isStopped) & egg.isEggShot(weapon, weaponType)) {
+            do egg.setStopped();  // Mark the egg as stopped
+            let countPopped = countPopped + 1;
+	    do egg.erase();
+
+            //do Output.printString("Egg is popped");
+            //do Output.println();
+		
+            return true;
+        }
+        return false;
+     }
+
+
+
+    method bool checkCollisionHere() {
+    	var int counter;
+	var Egg egg;
+    	let counter = 0;
+
+    	while (counter < 10) {
+	    let egg = eggsGame[counter];
+            if (checkCollisionWithEgg(egg)) {
+            	let eggsGame[counter] = egg; // Reassign the updated egg
+                return true;
+            }
+            let counter = counter + 1;
+        }
+        return false;
+    }
+
+
+
+    method void run() {
+        var boolean continueGame;  
+        // A variable to store if we should continue the game loop
+        var int i;
+        var Egg egg;
+	var boolean isStopped;
+
+        // Game continues until 5 eggs fall or all are dealt with
+    	let continueGame = (~isGameOver) & (countFallen < 5) & ((countFallen + countPopped) < 10); 
+
+
+        while (continueGame) {
+            let i = 0;
+
+            while (i < 10) { // Now going over the all 10 eggs 
+                do keyPressed();
+
+                //if (isGameOver) {
+                    //do endGame_in_the_middle();
+                    //return;
+                //}
+
+                let egg = eggsGame[i];
+	        let isStopped = egg.getStopped();
+
+                
+                if (~isStopped) {
+		    if (egg.isFallen()) {
+                    	do egg.setStopped();
+                        do Output.printString("you missed one!");
+                    	do Output.println();
+
+                    	do removeXiks();
+                    	let countFallen = countFallen + 1;
+                    }
+                
+                    if (~egg.isEggShot(weapon, weaponType) & ~egg.isFallen()) {
+                    	do egg.playEgg();
+                    	//do Output.printString("i play egg");
+                    	//do Output.println();
+                    }
+
+                }
+
+                //do Sys.wait(50);
+
+                let i = i + 1;
+            }
+
+
+            //do Sys.wait(1);
+
+            // Re-evaluate `continueGame` at the end of each iteration
+            let continueGame = (~isGameOver) & (countFallen < 5) & ((countFallen + countPopped) < 10);  
+
+        }
+         
+        // for debuging:
+        //do Output.printString("countFallen: ");
+        //do Output.printInt(countFallen);  
+        //do Output.println();
+
+        //do Output.printString("countPopped: ");
+        //do Output.printInt(countPopped);  
+        //do Output.println();
+
+
+        //do Output.printString("i ended here");
+        //do Output.println();
+
+        do endGame();
+        return;
+    }
+
+}

@@ -1,0 +1,86 @@
+class Arrow {
+
+    field int x;
+    field int y;
+
+    constructor Arrow new() {
+        // Initialize arrow's x, y
+        let x = 256;         
+        let y = 200;            
+        do draw_arrow(); 
+        return this;
+    }
+
+    method void initialize() {
+        // Re-initialize arrow's x, y
+        do init_drawing_of_arrow();
+        let x = 256;         
+        let y = 200;
+        do draw_arrow();
+        return;
+    }
+
+    method void shoot() {
+        // Move the arrow up the screen
+        var int i;
+        let i = 0;
+        while (i < 240) {
+            do init_drawing_of_arrow();
+            if (y > 0) {  // Limit upward movement to keep arrow visible
+                let y = y - 1;  
+            }
+            do draw_arrow();
+            let i = i + 1;
+        }
+        return;
+    }
+
+    method void move_left() {
+        if ((x-50) > 0) {                        
+            do init_drawing_of_arrow();   
+            let x = x - 50;                     
+            do draw_arrow();              
+        }
+        return;
+    }
+
+    method void move_right() {
+        if ((x+50) < 511) {                        
+            do init_drawing_of_arrow();   
+            let x = x + 50;                     
+            do draw_arrow();             
+        }
+        return;
+    }
+
+    method void draw_arrow() {
+        do Screen.setColor(true); 
+        do Screen.drawLine(x, y, x, y + 50); 
+        // Draws a small vertical line starting at (x,y)
+        //line length is 50 pixels
+        return;
+    }
+
+    method void init_drawing_of_arrow() {
+        do Screen.setColor(false); 
+        do Screen.drawLine(x, y, x, y + 50); 
+        // Clears the line at (x, y)
+        return;
+    }
+
+    method int getX() {
+        // Return the current x-coordinate of the arrow
+        return x;
+    }
+
+    method int getY() {
+        // Return the current y-coordinate of the arrow
+        return y;
+    }
+
+    method void dispose() {
+        // Deallocate the memory used by this arrow object
+        do Memory.deAlloc(this);
+        return;
+    }
+}

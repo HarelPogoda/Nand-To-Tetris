@@ -1,0 +1,210 @@
+function Egg.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push argument 2
+pop this 2
+push constant 0
+pop this 3
+push pointer 0
+call Egg.draw 1
+pop temp 0
+push pointer 0
+return
+function Egg.draw 0
+push argument 0
+pop pointer 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
+call Screen.drawCircle 3
+pop temp 0
+push constant 0
+return
+function Egg.erase 0
+push argument 0
+pop pointer 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
+call Screen.drawCircle 3
+pop temp 0
+push constant 0
+return
+function Egg.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function Egg.decSize 0
+push argument 0
+pop pointer 0
+push this 2
+push constant 0
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+call Egg.erase 1
+pop temp 0
+push this 2
+push constant 0
+sub
+pop this 2
+push pointer 0
+call Egg.draw 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Egg.moveDown 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Egg.erase 1
+pop temp 0
+push this 1
+push constant 2
+add
+pop this 1
+push pointer 0
+call Egg.draw 1
+pop temp 0
+push constant 0
+return
+function Egg.playEgg 0
+push argument 0
+pop pointer 0
+push this 3
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+call Egg.moveDown 1
+pop temp 0
+push constant 50
+call Sys.wait 1
+pop temp 0
+push pointer 0
+call Egg.decSize 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Egg.isFallen 0
+push argument 0
+pop pointer 0
+push this 1
+push constant 220
+gt
+push this 1
+push constant 220
+eq
+or
+push this 2
+push constant 0
+eq
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
+function Egg.setStopped 0
+push argument 0
+pop pointer 0
+push constant 0
+not
+pop this 3
+push constant 0
+return
+function Egg.getStopped 0
+push argument 0
+pop pointer 0
+push this 3
+return
+function Egg.checkCollision 1
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+push argument 1
+push this 0
+push this 2
+sub
+gt
+push argument 1
+push this 0
+push this 2
+sub
+eq
+or
+push argument 1
+push this 0
+push this 2
+add
+lt
+push argument 1
+push this 0
+push this 2
+add
+eq
+or
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 2
+push this 1
+lt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+not
+pop local 0
+push constant 0
+not
+pop this 3
+label IF_FALSE1
+label IF_FALSE0
+push local 0
+return
+function Egg.isEggShot 0
+push argument 0
+pop pointer 0
+push pointer 0
+push argument 1
+push argument 2
+call Egg.checkCollision 3
+return
+function Egg.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Egg.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return

@@ -1,0 +1,449 @@
+class Weapon {
+
+    field boolean isShot;
+    field int weaponType; // 1 = Rhombus, 2 = Square, 3 = Arrow
+    field int size_line; // for square
+    field int x, y; // Position , in square (x,y) is the top left corner 
+    // in arrow (x,y) is the top point of line 
+
+    field int length; // for arrow
+    field int width, height; // for Rhombus
+
+
+
+    constructor Weapon new(int selectedWeapon) {
+        // Initialize weapon's fields
+        
+        let weaponType = selectedWeapon;
+        let isShot = false;
+
+        if (selectedWeapon = 1) { // Rhombus
+            let width = 20;
+            let height = 30;
+            let x = 256;
+            let y = 200;
+        } 
+	if (selectedWeapon = 2) { // Square
+            let size_line = 30;
+            let x = 256;
+            let y = 200;
+        } 
+	if (selectedWeapon = 3) { // Arrow
+            let length = 30;
+            let x = 256;
+            let y = 200;
+        }
+          
+        do draw(); 
+        return this;
+    }
+
+
+    method void initialize() {
+	let isShot = false;
+
+        if (weaponType = 1) { // Rhombus
+            do initialize_rhombus();
+        } 
+	if (weaponType = 2) { // Square
+            do initialize_square();
+        }  
+	if (weaponType = 3) { // Arrow
+            do initialize_arrow();
+        }        
+        return;
+    }
+
+
+    //ARROW
+    method void initialize_arrow() {
+        // Clear the current arrow
+        do erase_arrow();
+        // Reset position to default
+        let x = 256;         
+        let y = 200;
+        let length = 30;
+        // Redraw the arrow
+        do drawArrow(true);
+        return;
+    }
+
+    //SQUARE
+    method void initialize_square() {
+        // Clear the current square
+        do erase_square();
+        // Reset position to default
+        // (x , y) is the top left corner of square
+        let x = 256;         
+        let y = 200;
+        let size_line = 30;
+        // Redraw the square
+        do drawSquare(true);
+        return;
+    }
+
+
+    //RHOMBUS
+    method void initialize_rhombus() {
+        // Clear the current rhombus
+        do erase_rhombus();
+        // Reset position to default
+        let x = 256;         
+        let y = 200;
+        let width = 20;
+        let height = 30; 
+        // Redraw the rhombus
+        do drawRhombus(true);
+        return;
+    }
+
+
+
+
+    method void shoot() {
+        let isShot = true;
+
+        if (weaponType = 1) { // Rhombus
+            do shoot_rhombus();
+        }  
+	if (weaponType = 2) { // Square
+            do shoot_square();
+        } 
+	if (weaponType = 3) { // Arrow
+            do shoot_arrow();
+        }         
+        return;
+    }
+
+
+
+    //ARROW
+    method void shoot_arrow() {
+        // Move the arrow up the screen
+        var int i;
+        let i = 0;
+        let isShot = true;
+
+        while (i < 240) {
+            do erase_arrow();
+            if (y > 0) {  // Limit upward movement to keep arrow visible
+                let y = y - 1;  
+                do Sys.wait(1); // small delay for smoother movement
+            }
+            do drawArrow(true);
+            let i = i + 1;
+        }
+        return;
+    }
+
+
+    //SQUARE
+    method void shoot_square() {
+        // Move the square up the screen
+        var int i;
+        let i = 0;
+        let isShot = true;
+
+        while (i < 240) {
+            // Clear the current square
+            do erase_square();
+
+            // Move the square up, ensuring the entire square stays visible
+            if (y > 0) { // The top edge must not go above y = 0
+                let y = Math.max(0, y - 1);
+            }
+
+            // Draw the square in its new position
+            do drawSquare(true);
+
+            // Increment the loop counter
+            let i = i + 1;
+        }
+        return;
+    }
+
+
+    //RHOMBUS
+    method void shoot_rhombus() {
+        // Move the rhombus up the screen
+        var int i;
+        let i = 0;
+        let isShot = true;
+
+        while (i < 240) {
+            // Clear the current rhombus
+            do erase_rhombus();
+
+            // Move the rhombus up, ensuring the top edge stays visible
+            if (y - (height / 2) > 0) { // The top vertex must not go above y = 0
+                let y = y - 1;
+            }
+
+            // Draw the rhombus in its new position
+            do drawRhombus(true);
+
+            // Increment the loop counter
+            let i = i + 1;
+        }
+        return;
+    }
+
+
+
+
+    method void move_left() {
+        if (weaponType = 1) { // Rhombus
+            do move_left_rhombus();
+        } 
+	if (weaponType = 2) { // Square
+            do move_left_square();
+        } 
+	if (weaponType = 3) { // Arrow
+            do move_left_arrow();
+        }                 
+        return;
+
+    }
+
+
+    //ARROW
+     method void move_left_arrow() {
+        do erase_arrow(); // Clear the current arrow
+        // Decrease x by 30, ensuring it doesn't go below 0  
+        let x = Math.max(0, x - 30); 
+        do drawArrow(true);             
+        return;
+
+    }
+
+
+    //SQUARE
+    method void move_left_square() {
+        do erase_square(); // Clear the current square
+        // Decrease x by 10, ensuring it doesn't go below 0  
+        let x = Math.max(0, x - 10); 
+        do drawSquare(true);             
+        return;
+    }
+
+
+    //RHOMBUS
+    method void move_left_rhombus() {
+        do erase_rhombus(); // Clear the current rhombus
+        
+        // Check if the rhombus will stay within bounds after moving left
+        if (x - 30 - width / 2 > 0) { // Ensure left edge stays visible
+            let x = x - 30; // Move left by 30 pixels
+        }
+        // Draw the rhombus in its new position
+        do drawRhombus(true);             
+        return;
+    }
+
+
+
+
+
+    method void move_right() {
+        if (weaponType = 1) { // Rhombus
+            do move_right_rhombus();
+        } 
+	if (weaponType = 2) { // Square
+            do move_right_square();
+        }
+	if (weaponType = 3) { // Arrow
+            do move_right_arrow();
+        }          
+        return;
+    }
+
+
+    //ARROW
+    method void move_right_arrow() {
+        do erase_arrow(); // Clear the current arrow
+        // Increase x by 30, ensuring it doesn't exceed 511
+        let x = Math.min(511, x + 30); 
+        do drawArrow(true);             
+        return;
+    }
+
+    //SQUARE
+    method void move_right_square() {
+        do erase_square(); // Clear the current square
+        // Increase x by 10, ensuring it doesn't exceed 511
+        let x = Math.min(511-size_line, x + 10); 
+        do drawSquare(true);             
+        return;
+    }
+
+    //RHOMBUS
+    method void move_right_rhombus() {
+        do erase_rhombus(); // Clear the current rhombus
+        
+        // Move right, ensuring the right vertex stays visible
+        if (x + 30 + width/2 < 512) { 
+            let x = x + 30; 
+        }
+        do drawRhombus(true);             
+        return;
+    }
+
+
+
+    method void draw() {
+        if (weaponType = 1) { // Rhombus
+            do drawRhombus(true);
+        } 
+	if (weaponType = 2) { // Square
+            do drawSquare(true);
+        } 
+	if (weaponType = 3) { // Arrow
+            do drawArrow(true);
+        }
+        return;
+    }
+
+    //ARROW
+    method void drawArrow(bool color) {
+    	do Screen.setColor(color); 
+        do Screen.drawLine(x, y, x, y + 50); 
+        // Draws a small vertical line starting at (x,y)
+        // (x,y) is the top point of line 
+        //line length is 50 pixels
+        return;
+    }
+
+    //SQUARE
+    method void drawSquare(bool color) {
+        do Screen.setColor(color); 
+    
+        // Draw the top side
+        do Screen.drawLine(x, y, x + size_line, y);
+        // Draw the bottom side
+        do Screen.drawLine(x, y + size_line, x + size_line, y + size_line);
+        // Draw the left side
+        do Screen.drawLine(x, y, x, y + size_line);
+        // Draw the right side
+        do Screen.drawLine(x + size_line, y, x + size_line, y + size_line);
+    
+        return;
+    }
+
+
+    //RHOMBUS
+    method void drawRhombus(bool color) {
+        // Declare the local variables
+        var int topX, topY, bottomX, bottomY, leftX, leftY, rightX, rightY;
+
+    	var boolean isLeftXValid, isRightXValid, isTopYValid, isBottomYValid;
+
+
+        // Calculate vertices of the rhombus
+    	let topX = x;
+    	let topY = y - (height / 2);
+    	let bottomX = x;
+    	let bottomY = y + (height / 2);
+    	let leftX = x - (width / 2);
+    	let leftY = y;
+    	let rightX = x + (width / 2);
+    	let rightY = y;
+
+    	// Ensure vertices are within bounds before drawing
+    	let isLeftXValid = (leftX > -1);         // Equivalent to leftX >= 0
+    	let isRightXValid = (rightX < 500);      // Equivalent to rightX <= 499
+    	let isTopYValid = (topY > -1);           // Equivalent to topY >= 0
+    	let isBottomYValid = (bottomY < 256);    // Equivalent to bottomY <= 255
+
+    	if (isLeftXValid & isRightXValid & isTopYValid & isBottomYValid) {
+            do Screen.setColor(color);
+            do Screen.drawLine(topX, topY, rightX, rightY);  // Top-right
+            do Screen.drawLine(rightX, rightY, bottomX, bottomY); // Bottom-right
+            do Screen.drawLine(bottomX, bottomY, leftX, leftY); // Bottom-left
+            do Screen.drawLine(leftX, leftY, topX, topY);  // Top-left
+        }        
+	return;
+    }
+
+
+
+
+    method void erase() {
+        if (weaponType = 1) { // Rhombus
+            do erase_rhombus();
+        } 
+	if (weaponType = 2) { // Square
+            do erase_square();
+        } 
+	if (weaponType = 3) { // Arrow
+            do erase_arrow();
+        }
+        return;
+    }
+
+    //ARROW
+    method void erase_arrow() {
+        // Clear the square boundaries
+        do drawArrow(false); // using color=false to erase
+	return;
+    }
+
+    //SQUARE
+    method void erase_square() {
+    	// Clear the square boundaries
+        do drawSquare(false); // using color=false to erase      
+        return;
+    }
+
+
+    //RHOMBUS
+    method void erase_rhombus() {
+        // Erase only if the rhombus is within bounds
+        if (((x - width / 2 > 0) | (x - width / 2 = 0)) & (x + width / 2 < 511)) {
+            do drawRhombus(false); // Use color = false to erase
+        }
+        return;
+    }
+
+    
+    //FOR ALL TYPES OBJECTS
+
+    method int getX() {
+        // Return the current x-coordinate of the weapon
+        return x;
+    }
+
+    method int getY() {
+        // Return the current y-coordinate of the weapon
+        return y;
+    }
+
+
+    method int getSize() {
+        // Return the current size of the weapon
+        return size_line;
+    }
+
+
+    method int getHeight() {
+        // Return the current height of the weapon
+        return height;
+    }
+
+    method int getWidth() {
+        // Return the current width of the weapon
+        return width;
+    }
+
+
+    method bool getisShot() {
+	// return the isShot boolean value for weapon
+	return isShot;
+    }
+
+
+    method void dispose() {
+        // Deallocate the memory used by this weapon object
+        do Memory.deAlloc(this);
+        return;
+    }
+}

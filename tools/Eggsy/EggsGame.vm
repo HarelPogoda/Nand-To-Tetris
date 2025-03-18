@@ -1,0 +1,610 @@
+function EggsGame.new 0
+push constant 8
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+call Weapon.new 1
+pop this 6
+push argument 0
+pop this 7
+push constant 0
+pop this 4
+push constant 0
+pop this 5
+push constant 0
+pop this 2
+push constant 0
+pop this 3
+call Xiks.new 0
+pop this 1
+push constant 10
+call Array.new 1
+pop this 0
+push constant 0
+push this 0
+add
+push constant 60
+push constant 60
+push constant 15
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push this 0
+add
+push constant 140
+push constant 50
+push constant 18
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push this 0
+add
+push constant 220
+push constant 55
+push constant 12
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push this 0
+add
+push constant 300
+push constant 65
+push constant 14
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push this 0
+add
+push constant 380
+push constant 60
+push constant 16
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push this 0
+add
+push constant 460
+push constant 80
+push constant 12
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 6
+push this 0
+add
+push constant 120
+push constant 95
+push constant 16
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push this 0
+add
+push constant 260
+push constant 100
+push constant 14
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push this 0
+add
+push constant 440
+push constant 150
+push constant 18
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 9
+push this 0
+add
+push constant 400
+push constant 120
+push constant 19
+call Egg.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push pointer 0
+return
+function EggsGame.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function EggsGame.endGame_in_the_middle 0
+push argument 0
+pop pointer 0
+push constant 23
+call String.new 1
+push constant 87
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 89
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 77
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 68
+call String.appendChar 2
+push constant 68
+call String.appendChar 2
+push constant 76
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 63
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+call Output.println 0
+pop temp 0
+push pointer 0
+call EggsGame.disposeAll 1
+pop temp 0
+push constant 0
+return
+function EggsGame.disposeAll 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 10
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 1
+call Egg.dispose 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push this 6
+call Weapon.dispose 1
+pop temp 0
+push this 1
+call Xiks.dispose 1
+pop temp 0
+push pointer 0
+call EggsGame.dispose 1
+pop temp 0
+push constant 0
+return
+function EggsGame.endGame 0
+push argument 0
+pop pointer 0
+push this 2
+push constant 5
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+pop this 5
+goto IF_END0
+label IF_FALSE0
+push constant 0
+not
+pop this 5
+label IF_END0
+push pointer 0
+call EggsGame.disposeAll 1
+pop temp 0
+push constant 0
+return
+function EggsGame.clearScreen 0
+push argument 0
+pop pointer 0
+call Screen.clearScreen 0
+pop temp 0
+push constant 0
+return
+function EggsGame.getIsFailed 0
+push argument 0
+pop pointer 0
+push this 5
+return
+function EggsGame.keyPressed 1
+push argument 0
+pop pointer 0
+call Keyboard.keyPressed 0
+pop local 0
+push local 0
+push constant 113
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+pop this 4
+push pointer 0
+call EggsGame.endGame_in_the_middle 1
+pop temp 0
+push constant 0
+return
+label IF_FALSE0
+push local 0
+push constant 132
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 6
+call Weapon.move_right 1
+pop temp 0
+label IF_FALSE1
+push local 0
+push constant 130
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push this 6
+call Weapon.move_left 1
+pop temp 0
+label IF_FALSE2
+push local 0
+push constant 128
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push this 6
+call Weapon.shoot 1
+pop temp 0
+push pointer 0
+call EggsGame.checkCollisionHere 1
+pop temp 0
+push constant 50
+call Sys.wait 1
+pop temp 0
+push this 6
+call Weapon.initialize 1
+pop temp 0
+label IF_FALSE3
+push constant 0
+return
+function EggsGame.removeXiks 0
+push argument 0
+pop pointer 0
+push this 1
+call Xiks.erase 1
+pop temp 0
+push this 1
+call Xiks.getNumberLives 1
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+pop this 5
+push constant 0
+not
+pop this 4
+push constant 15
+call String.new 1
+push constant 89
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 117
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 105
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 100
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 110
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+call Output.println 0
+pop temp 0
+push pointer 0
+call EggsGame.endGame 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function EggsGame.checkCollisionWithEgg 1
+push argument 0
+pop pointer 0
+push argument 1
+call Egg.getStopped 1
+pop local 0
+push local 0
+not
+push argument 1
+push this 6
+push this 7
+call Egg.isEggShot 3
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+call Egg.setStopped 1
+pop temp 0
+push this 3
+push constant 1
+add
+pop this 3
+push argument 1
+call Egg.erase 1
+pop temp 0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
+function EggsGame.checkCollisionHere 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 10
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 1
+push pointer 0
+push local 1
+call EggsGame.checkCollisionWithEgg 2
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push this 0
+add
+push local 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+not
+return
+label IF_FALSE0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function EggsGame.run 4
+push argument 0
+pop pointer 0
+push this 4
+not
+push this 2
+push constant 5
+lt
+and
+push this 2
+push this 3
+add
+push constant 10
+lt
+and
+pop local 0
+label WHILE_EXP0
+push local 0
+not
+if-goto WHILE_END0
+push constant 0
+pop local 1
+label WHILE_EXP1
+push local 1
+push constant 10
+lt
+not
+if-goto WHILE_END1
+push pointer 0
+call EggsGame.keyPressed 1
+pop temp 0
+push local 1
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 2
+call Egg.getStopped 1
+pop local 3
+push local 3
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 2
+call Egg.isFallen 1
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 2
+call Egg.setStopped 1
+pop temp 0
+push constant 15
+call String.new 1
+push constant 121
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 117
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 105
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 100
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 110
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+call Output.println 0
+pop temp 0
+push pointer 0
+call EggsGame.removeXiks 1
+pop temp 0
+push this 2
+push constant 1
+add
+pop this 2
+label IF_FALSE1
+push local 2
+push this 6
+push this 7
+call Egg.isEggShot 3
+not
+push local 2
+call Egg.isFallen 1
+not
+and
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 2
+call Egg.playEgg 1
+pop temp 0
+label IF_FALSE2
+label IF_FALSE0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push this 4
+not
+push this 2
+push constant 5
+lt
+and
+push this 2
+push this 3
+add
+push constant 10
+lt
+and
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push pointer 0
+call EggsGame.endGame 1
+pop temp 0
+push constant 0
+return

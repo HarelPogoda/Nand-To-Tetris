@@ -1,0 +1,97 @@
+        /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+        function void drawLine(int x1, int y1, int x2, int y2) {
+            // The case where x1 != x2 and y1 != y2 should be implemented without
+            // multiplication or division
+            // Pseudocode:
+            // 1. let x = x1, y = y1, a = 0, b = 0, diff = 0
+            // 2. Compute dx and dy
+            // 3. while ((a <= dx) and (b <= dy))
+            // 4.   do drawPixel(x+a, y+b)
+            // 5.   if (diff < 0) { let a=a+1, diff=diff+dy }
+            // 6.   else          { let b=b+1, diff=diff-dx }
+            //
+            // The case where y1 == y2 can be implemented efficiently by
+            // trying to draw as many pixels as possible in a single assignment,
+            // similarly to Fill in project 4.
+            var int a, b, c, d, diff, dx, dy, startAddress, endAddress, startValue, endValue, currentValue;
+            let startAddress = Screen.getRegister(x1, y1);
+            let endAddress = Screen.getRegister(x2, y2);
+            let dx = x2 - x1;
+            let dy = y2 - y1;
+            if (dx < 0) {do Screen.drawLine(x2, y2, x1, y1); return;} //Now we can assume that dx is non-negative
+            let c = 0;
+            let b = 1;
+            let diff = 0;
+            if (dy = 0){
+                let startValue = x1 & 15;
+                let startValue = bitValue[startValue] - 1;
+                let startValue = ~startValue; //startvalue = 000001111111
+
+                let endValue = x2 & 15;
+                if (endValue = 15) { let endValue = -1;}
+                else { let endValue = bitValue[endValue+1] - 1;} //endvalue = 11111000000
+
+                let currentValue = Memory.peek(startAddress);// currentvalue = 01001010101
+                if (color = 0) { let startValue = (~startValue) & currentValue;}
+                else { let startValue = startValue | currentValue;}
+
+                let currentValue = Memory.peek(endAddress);
+                if (color = 0) { let endValue = (~endValue) & currentValue;}
+                else { let endValue = endValue | currentValue;}
+
+                if (startAddress = endAddress){
+                    do Memory.poke(startAddress, (startValue & endValue));
+                    return;
+                }
+                do Memory.poke(startAddress, startValue);
+                /**while ((((x1 + c) & 15) > 0) & ((x1 + c) < (x2 + 1))){
+                    do Screen.drawPixel(x1+c, y1);
+                    let c = c+1;
+                }
+                if (c>0) { let b = 1;}*/
+                while (startAddress+b < endAddress){
+                    do Memory.poke(startAddress+b, (-color));
+                    let b = b+1;
+                }
+                do Memory.poke(endAddress, endValue);
+                /**let c = 0;
+                let startAddress = x2 - (x2 & 15);
+                while (startAddress+c < (x2 + 1)){
+                    if ((startAddress+c) > (x1 - 1)){
+                        do Screen.drawPixel(startAddress+c, y1);
+                    }
+                    let c = c+1;
+                }*/
+                return;
+            }
+
+            if (dy > 0){
+                while ((c < dx) | (b < dy)){
+                    do Screen.drawPixel(x1+c, y1+b);
+                    if (diff < 0) {
+                        let c=c+1;
+                        let diff=diff+dy;
+                    }
+                    else {
+                        let b=b+1;
+                        let diff=diff-dx;
+                    }
+                }
+                return;
+            }
+
+            else {
+                while ((c < dx) | (b > dy)){
+                    do Screen.drawPixel((x1+c), (y1+b));
+                    if (diff > 0){
+                        let c=c+1;
+                        let diff=diff+dy;
+                    }
+                    else {
+                        let b=b-1;
+                        let diff=diff+dx;
+                    }
+                }
+                return;
+            }
+        }

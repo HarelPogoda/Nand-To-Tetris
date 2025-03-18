@@ -1,0 +1,225 @@
+
+class GameMenu {
+
+    field int selectedWeapon; // Field to store the selected weapon
+    field int rhombusX, rhombusY, rhombusW, rhombusH;
+    field int squareX, squareY, squareSize;
+    field int arrowX, arrowY, arrowLength;
+    field bool keyR, keyS, keyA, keyPressed;
+
+    constructor GameMenu new() {
+        return this; // return the newly created object
+    }
+
+
+    method void showMenu() {
+
+        // Step 1: Display the title
+        do Output.moveCursor(2, 10); // Move to row 2, column 10
+        do Output.printString("Choose your weapon");
+
+        // step- declare
+        let keyR=false;
+        let keyS=false;
+        let keyA=false;
+        let keyPressed=false;
+
+
+        let rhombusX=50;
+        let rhombusY=50;
+        let rhombusW=50;
+        let rhombusH=50;
+
+        let squareX=200;
+        let squareY=50;
+        let squareSize=50;
+
+        let arrowX=350;
+        let arrowY=20;
+        let arrowLength=50;
+
+        // Step 2: Draw buttons
+        do drawButton(50, 50, 100, 100, 1);
+        do drawButton(200, 50, 100, 100, 2);
+        do drawButton(350, 50, 100, 100, 3);
+
+        // Default selected weapon
+        let selectedWeapon = 1; // 1 = Rhombus, 2 = Square, 3 = Arrow
+
+        // Step 3: Wait for user input and detect clicks
+        while (~keyPressed) { //while key is not pressed
+
+            if (Keyboard.keyPressed() = 82) { // Key R for Rhombus
+                let selectedWeapon = 1;
+                let keyR = true;
+                let keyPressed=true;
+                do decSizeArrow();
+                do decSizeSquare();
+		do Sys.wait(500);
+            }
+            if (Keyboard.keyPressed() = 83) { // Key S for Square
+                let selectedWeapon = 2;
+                let keyS = true;
+                let keyPressed=true;
+                do decSizeArrow();
+                do decSizeRhombus();
+		do Sys.wait(500);
+            }
+            if (Keyboard.keyPressed() = 65) { // Key A for Arrow
+                let selectedWeapon = 3;
+                let keyA = true;
+                let keyPressed=true;
+                do decSizeSquare();
+                do decSizeRhombus();
+		do Sys.wait(500);
+            }
+
+        }
+        return;
+    }
+
+  
+    method void drawButton(int x, int y, int width, int height, int labelType) {
+        var int centerX, centerY;
+
+        // Calculate the center of the button
+        let centerX = x + (width / 2);
+        let centerY = y + (height / 2);
+
+        // Set global variables for drawing (specific to each shape)
+        if (labelType = 1) { // Rhombus
+            let rhombusX = centerX;
+            let rhombusY = centerY;
+        }
+        if (labelType = 2) { // Square
+            let squareX = centerX;
+            let squareY = centerY;
+        }
+        if (labelType = 3) { // Arrow
+            let arrowX = centerX; // Center the arrow horizontally
+            let arrowY = centerY - (arrowLength / 2); // Center the arrow vertically
+        }
+
+        // Draw shape inside the button based on labelType
+        if (labelType = 1) { // Rhombus
+            do drawRhombus(true);
+        }
+        if (labelType = 2) { // Square
+            do drawSquare(true);
+        }
+        if (labelType = 3) { // Arrow
+            do drawArrow(true);
+        }
+
+    	return;
+    }
+
+
+
+    method void decSizeArrow() {
+      
+        // For Arrow (horizontal line)
+        if((keyS) | (keyR)){
+            if (arrowLength > 1) {
+                do drawArrow(false); //erase current
+                let arrowLength = arrowLength - 30; // Decrease line length
+                do drawArrow(true); // Redraw arrow
+            }
+
+        }
+        return;
+    }
+   
+    method void decSizeRhombus() {
+        if((keyS) | (keyA)){
+            if ((rhombusW > 2) & (rhombusH > 2)) {
+                do drawRhombus(false); //erase current
+                let rhombusW = rhombusW - 20;  // Decrease width
+                let rhombusH = rhombusH - 20; // Decrease height
+                do drawRhombus(true); // Redraw rhombus
+            }
+        }
+        return;
+    }
+
+
+
+    method void decSizeSquare() {
+        if((keyA) | (keyR)){
+            if (squareSize > 2) {
+                do drawSquare(false); //erase current
+                let squareSize = squareSize - 20; // Decrease square size
+                do drawSquare(true); // Redraw square
+            }
+        }
+        return;
+    }
+
+
+    method void clearScreen() {
+        do Screen.clearScreen(); // Clears all graphics and text from the screen
+        return;
+    }
+
+
+    method void drawRhombus(bool color) {
+        var int top_x, top_y, bottom_x, bottom_y, left_x, left_y, right_x, right_y;
+
+        // Calculate vertices of the rhombus
+        let top_x = rhombusX;
+        let top_y = rhombusY - (rhombusH / 2);
+        let bottom_x = rhombusX;
+        let bottom_y = rhombusY + (rhombusH / 2);
+        let left_x = rhombusX - (rhombusW / 2);
+        let left_y = rhombusY;
+        let right_x = rhombusX + (rhombusW / 2);
+        let right_y = rhombusY;
+
+        // Draw or erase the four sides of the rhombus
+        do Screen.setColor(color);
+        do Screen.drawLine(top_x, top_y, right_x, right_y);  // Top-right
+        do Screen.drawLine(right_x, right_y, bottom_x, bottom_y); // Bottom-right
+        do Screen.drawLine(bottom_x, bottom_y, left_x, left_y); // Bottom-left
+        do Screen.drawLine(left_x, left_y, top_x, top_y);  // Top-left
+
+        return;
+    }
+
+
+    method void drawSquare(bool color) {
+        var int left, top, right, bottom;
+
+        // Calculate the square's boundaries
+        let left = squareX - (squareSize / 2);
+        let top = squareY - (squareSize / 2);
+        let right = squareX + (squareSize / 2);
+        let bottom = squareY + (squareSize / 2);
+
+        // Draw or erase the four sides of the square 
+        do Screen.setColor(color);
+        do Screen.drawLine(left, top, right, top);    // Top side
+        do Screen.drawLine(left, bottom, right, bottom); // Bottom side
+        do Screen.drawLine(left, top, left, bottom); // Left side
+        do Screen.drawLine(right, top, right, bottom); // Right side
+
+        return;
+    }
+
+    method void drawArrow(bool color) {
+
+        // Draw or erase the arrow as a vertical line
+        do Screen.setColor(color);
+        do Screen.drawLine(arrowX, arrowY, arrowX, arrowY + arrowLength); // Vertical line starting at (x, y)
+
+        return;
+ 
+    }
+
+
+
+    method int getSelectedWeapon() {
+        return selectedWeapon; 
+    }
+
+
+}

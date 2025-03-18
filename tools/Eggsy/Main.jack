@@ -1,0 +1,57 @@
+// This file is part of nand2tetris, as taught in The Hebrew University, and
+// was written by Aviv Yaish. It is an extension to the specifications given
+// [here](https://www.nand2tetris.org) (Shimon Schocken and Noam Nisan, 2017),
+// as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
+// Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
+
+/**
+  * In Jack programs, the first function that runs is always the function "main"
+  * from the class "Main".
+  * You can include as many classes and functions as you want.
+  */
+class Main {
+  function void main() {
+
+    var GameMenu menu;
+    
+    var EggsGame game;
+    var int selectedWeapon;
+    var boolean isFailed;
+
+    // Step 1: Initialize the menu and display it
+    let menu = GameMenu.new();
+    do menu.showMenu();
+    let selectedWeapon = menu.getSelectedWeapon();
+
+    // Step 2: Clear the screen after weapon selection
+    do menu.clearScreen(); // Clear the menu elements from the screen
+    
+    let game = EggsGame.new(selectedWeapon); // Pass weapon type as an int
+    
+    // Step 5: Start the game
+    do game.run();
+
+
+    // Step 6: Clear game screen
+    do game.clearScreen(); // Clear the menu elements from the screen
+
+
+    // Step 7: Print statement winner/looser 
+    let isFailed = game.getIsFailed();
+    if(isFailed){
+	do Output.println();
+        do Output.printString("GAME OVER! YOU FAILED!");
+        do Output.println();
+    }
+    else{
+	do Output.println();
+        do Output.printString("GAME OVER! YOU WON!");
+        do Output.println();
+
+    }
+
+    return;
+
+  }
+}
+

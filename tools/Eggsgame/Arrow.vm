@@ -1,0 +1,165 @@
+function Arrow.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push constant 256
+pop this 0
+push constant 200
+pop this 1
+push pointer 0
+call Arrow.draw_arrow 1
+pop temp 0
+push pointer 0
+return
+function Arrow.initialize 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Arrow.init_drawing_of_arrow 1
+pop temp 0
+push constant 256
+pop this 0
+push constant 200
+pop this 1
+push constant 25
+pop this 0
+push pointer 0
+call Arrow.draw_arrow 1
+pop temp 0
+push constant 0
+return
+function Arrow.shoot 1
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 240
+lt
+not
+if-goto WHILE_END0
+push pointer 0
+call Arrow.init_drawing_of_arrow 1
+pop temp 0
+push this 1
+push constant 0
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 1
+push constant 1
+sub
+pop this 1
+label IF_FALSE0
+push pointer 0
+call Arrow.draw_arrow 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Arrow.move_left 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 50
+sub
+push constant 0
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+call Arrow.init_drawing_of_arrow 1
+pop temp 0
+push this 0
+push constant 50
+sub
+pop this 0
+push pointer 0
+call Arrow.draw_arrow 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Arrow.move_right 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 50
+add
+push constant 511
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+call Arrow.init_drawing_of_arrow 1
+pop temp 0
+push this 0
+push constant 50
+add
+pop this 0
+push pointer 0
+call Arrow.draw_arrow 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Arrow.draw_arrow 0
+push argument 0
+pop pointer 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
+push this 1
+push constant 50
+add
+call Screen.drawLine 4
+pop temp 0
+push constant 0
+return
+function Arrow.init_drawing_of_arrow 0
+push argument 0
+pop pointer 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
+push this 1
+push constant 50
+add
+call Screen.drawLine 4
+pop temp 0
+push constant 0
+return
+function Arrow.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Arrow.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Arrow.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

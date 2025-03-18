@@ -1,0 +1,114 @@
+class Egg {
+    field int x, y, radius;
+    field boolean isStopped;
+
+    constructor Egg new(int Ax, int Ay, int Aradius) {
+        let x = Ax;  
+        let y = Ay;
+        let radius = Aradius;
+        let isStopped=false;
+
+        do draw();
+        return this;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius); 
+        return;
+    }
+
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, radius); 
+        return;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void decSize() {
+        if (radius > 0) {
+            do erase();
+            let radius = radius - 0.5; 
+            do draw();
+        }
+        return;
+    }
+
+    /** Moves the egg down by 2 pixels */
+    method void moveDown() {
+        do erase();
+        let y = y + 2; 
+        do draw();
+        return;
+    }
+
+    method void playEgg() {
+        //if egg is not stopped, then it is in the game and can move
+        // egg is stopped if its popped or fallen
+        if(~isStopped){
+            do moveDown();
+            do Sys.wait(50);
+            do decSize();
+        }
+        return;
+    }
+
+    method bool isFallen() {
+        if ((y > 220) | (y = 220)  | (radius = 0)) { 
+            return true;
+        }
+        return false;
+    }
+
+
+    method void setStopped(){
+        let isStopped=true;
+        return;
+    }
+
+    method bool getStopped(){
+        return isStopped;
+    }
+
+
+    method boolean checkCollision(int arrowX, int arrowY) {
+        var boolean isColliding;
+        let isColliding = false;
+
+        // Check if the arrow is within the horizontal range of the egg
+        if (((arrowX > (x - radius)) | (arrowX = (x - radius))) & ((arrowX < (x + radius)) | (arrowX = (x + radius)))) {  
+            // Check if the arrow is within the vertical range of the egg
+            if ((arrowY < y)) { 
+                let isColliding = true;  
+                let isStopped = true;
+                // The arrow is inside the egg's bounding box
+            }
+
+        }
+
+        return isColliding;
+    }
+
+
+    method bool isEggShot(int arrowX, int arrowY) {
+        // We check if the arrow shot the egg
+        return checkCollision(arrowX, arrowY);
+    }
+
+    method int getX() {
+        // Return the current x-coordinate of the arrow
+        return x;
+    }
+
+    method int getY() {
+        // Return the current y-coordinate of the arrow
+        return y;
+    }
+
+
+
+}
