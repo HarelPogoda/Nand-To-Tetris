@@ -1,0 +1,231 @@
+// This file is part of nand2tetris, as taught in The Hebrew University, and
+// was written by Aviv Yaish. It is an extension to the specifications given
+// [here](https://www.nand2tetris.org) (Shimon Schocken and Noam Nisan, 2017),
+// as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
+// Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
+
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 256 rows (indexed 0..255, top to bottom)
+ * of 512 pixels each (indexed 0..511, left to right). The top left pixel on 
+ * the screen is indexed (0,0).
+ */
+class Screen {
+        static int screenStart, screenEnd, color;
+        static Array bitValue;
+        /** Initializes the Screen. */
+        function void init() {
+            let screenStart = 16384;
+            let screenEnd = screenStart + 8192;
+            let color = 1;
+
+            let bitValue = Array.new(15);
+            let bitValue[0] = 1;
+            let bitValue[1] = 2;
+            let bitValue[2] = 4;
+            let bitValue[3] = 8;
+            let bitValue[4] = 16;
+            let bitValue[5] = 32;
+            let bitValue[6] = 64;
+            let bitValue[7] = 128;
+            let bitValue[8] = 256;
+            let bitValue[9] = 512;
+            let bitValue[10] = 1024;
+            let bitValue[11] = 2048;
+            let bitValue[12] = 4096;
+            let bitValue[13] = 8192;
+            let bitValue[14] = 16384;
+            let bitValue[15] = 2*16384;
+
+            return;
+        }
+
+        /** Erases the entire screen. */
+        function void clearScreen() {
+            var int screenRegister;
+            let screenRegister = screenStart;
+            while (screenRegister < screenEnd){
+                do Memory.poke(screenRegister, 0);
+                let screenRegister = screenRegister + 1;
+            }
+            return;
+        }
+
+        /** Sets the current color, to be used for all subsequent drawXXX commands.
+         *    Black is represented by true, white by false. */
+        function void setColor(boolean b) {
+            if (b) { let color = 1;}
+            else { let color = 0;}
+            return;
+        }
+
+        /** Draws the (x,y) pixel, using the current color. */
+        function void drawPixel(int x, int y) {
+            // For this function, you will need to calculate the value x%16.
+            // It should be calculated quickly without using multiplication or
+            // division, using exactly one basic math/logical operation.
+            // In addition, calculating 16384 + y * 32 + x/16 should not use
+            // division or multiplication.
+            // Pseudocode:
+            // 1. Compute the RAM address where the (x,y) pixel is
+            //    represented: 16384 + (32*y) + (x/16).
+            // 2. Use Memory.peek to get the 16-bit value of this address
+            // 3. Use some bitwise operation to set (only) the bit that corresponds
+            //    to the pixel to the current color.
+            // 4. Use Memory.poke to write the modified 16-bit value to the RAM
+            // address.
+            var int xRemainder, address, currentValue, pixel;
+            let xRemainder = (15 & x);
+            let address = Screen.getRegister(x, y);
+            let currentValue = Memory.peek(address);
+            let pixel = bitValue[xRemainder];
+            if (color = 0){
+                let pixel = ~(pixel);
+                do Memory.poke(address, (currentValue & pixel));
+                return;
+            }
+            do Memory.poke(address, (currentValue | pixel));
+            return;
+        }
+
+
+        /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+        function void drawLine(int x1, int y1, int x2, int y2) {
+            // The case where x1 != x2 and y1 != y2 should be implemented without
+            // multiplication or division
+            // Pseudocode:
+            // 1. let x = x1, y = y1, a = 0, b = 0, diff = 0
+            // 2. Compute dx and dy
+            // 3. while ((a <= dx) and (b <= dy))
+            // 4.   do drawPixel(x+a, y+b)
+            // 5.   if (diff < 0) { let a=a+1, diff=diff+dy }
+            // 6.   else          { let b=b+1, diff=diff-dx }
+            //
+            // The case where y1 == y2 can be implemented efficiently by
+            // trying to draw as many pixels as possible in a single assignment,
+            // similarly to Fill in project 4.
+            var int a, b, c, d, diff, dx, dy, startAddress, endAddress, startValue, endValue, currentValue;
+            let startAddress = Screen.getRegister(x1, y1);
+            let endAddress = Screen.getRegister(x2, y2);
+            let dx = x2 - x1;
+            let dy = y2 - y1;
+            if (dx < 0) {do Screen.drawLine(x2, y2, x1, y1); return;} //Now we can assume that dx is non-negative
+            let c = 0;
+            let b = 1;
+            let diff = 0;
+            if (dy = 0){
+                let startValue = x1 & 15;
+                let startValue = bitValue[startValue] - 1;
+                let startValue = ~startValue; //startvalue = 000001111111
+
+                let endValue = x2 & 15;
+                if (endValue = 15) { let endValue = -1;}
+                else { let endValue = bitValue[endValue+1] - 1;} //endvalue = 11111000000
+
+                let currentValue = Memory.peek(startAddress);// currentvalue = 01001010101
+                if (color = 0) { let startValue = (~startValue) & currentValue;}
+                else { let startValue = startValue | currentValue;}
+
+                let currentValue = Memory.peek(endAddress);
+                if (color = 0) { let endValue = (~endValue) & currentValue;}
+                else { let endValue = endValue | currentValue;}
+
+                if (startAddress = endAddress){
+                    if (color = 0) {do Memory.poke(startAddress, (startValue | endValue));}
+                    else {do Memory.poke(startAddress, (startValue & endValue));}
+                    return;
+                }
+                do Memory.poke(startAddress, startValue);
+                /**while ((((x1 + c) & 15) > 0) & ((x1 + c) < (x2 + 1))){
+                    do Screen.drawPixel(x1+c, y1);
+                    let c = c+1;
+                }
+                if (c>0) { let b = 1;}*/
+                while (startAddress+b < endAddress){
+                    do Memory.poke(startAddress+b, (-color));
+                    let b = b+1;
+                }
+                do Memory.poke(endAddress, endValue);
+                /**let c = 0;
+                let startAddress = x2 - (x2 & 15);
+                while (startAddress+c < (x2 + 1)){
+                    if ((startAddress+c) > (x1 - 1)){
+                        do Screen.drawPixel(startAddress+c, y1);
+                    }
+                    let c = c+1;
+                }*/
+                return;
+            }
+
+            if (dy > 0){
+                while ((c < dx) | (b < dy)){
+                    do Screen.drawPixel(x1+c, y1+b);
+                    if (diff < 0) {
+                        let c=c+1;
+                        let diff=diff+dy;
+                    }
+                    else {
+                        let b=b+1;
+                        let diff=diff-dx;
+                    }
+                }
+                return;
+            }
+
+            else {
+                while ((c < dx) | (b > dy)){
+                    do Screen.drawPixel((x1+c), (y1+b));
+                    if (diff > 0){
+                        let c=c+1;
+                        let diff=diff+dy;
+                    }
+                    else {
+                        let b=b-1;
+                        let diff=diff+dx;
+                    }
+                }
+                return;
+            }
+        }
+
+        /** Draws a filled rectangle whose top left corner is (x1, y1)
+         * and bottom right corner is (x2,y2), using the current color. */
+        function void drawRectangle(int x1, int y1, int x2, int y2) {
+            var int yGoes;
+            let yGoes = y1;
+            while (yGoes < (y2+1)){
+                do Screen.drawLine(x1, yGoes, x2, yGoes);
+                let yGoes = yGoes+1;
+            }
+            return;
+        }
+
+        /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
+        function void drawCircle(int x, int y, int r) {
+            // This can be implemented efficiently by drawing multiple lines at
+            // each iteration. You can use multiplication and sqrt.
+            // Pseudocode:
+            // 1. for (dy = -r ... r)
+            // 2.   let halfWidth = sqrt(r*r - dy*dy)
+            // 3.   do drawLine(x-halfWidth, y+dy, x+halfWidth, y+dy)
+            var int dy, halfWidth;
+            let dy = -r;
+            while (dy < (r + 1))
+            {
+                let halfWidth = Math.sqrt((r*r) - (dy*dy));
+                // do Output.printInt(halfWidth);
+                do Screen.drawLine(x-halfWidth, y+dy, x+halfWidth, y+dy); 
+                let dy = dy + 1;
+            }
+            return;
+        }
+
+        function int getRegister(int x, int y){
+            var int thirtyTwoY, xOverSixteen, xRemainder;
+            let thirtyTwoY = (^^^^^y);
+            let xRemainder = (15 & x);
+            let xOverSixteen = (x - xRemainder);
+            let xOverSixteen = (####xOverSixteen);
+            return (16384 + thirtyTwoY + xOverSixteen);
+        }
+}

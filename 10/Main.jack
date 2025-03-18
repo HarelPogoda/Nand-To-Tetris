@@ -1,0 +1,12 @@
+class Main {
+    function void main() {
+        var int x, y;
+        let x = 5; let y = 10;
+        let x = #x;
+        let x = ^x;
+        do Output.printInt(x); do Output.printInt(y);
+        return;
+    }
+}
+
+

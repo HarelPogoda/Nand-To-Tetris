@@ -1,0 +1,52 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux8Way.hdl
+
+/**
+ * 8-way demultiplexor:
+ * {a, b, c, d, e, f, g, h} = {in, 0, 0, 0, 0, 0, 0, 0} if sel == 000
+ *                            {0, in, 0, 0, 0, 0, 0, 0} if sel == 001
+ *                            etc.
+ *                            {0, 0, 0, 0, 0, 0, 0, in} if sel == 111
+ */
+
+CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    // Put your code here:
+
+    // First level: 
+    //Split the input into two groups (a-d) and (e-h) 
+    //based on sel[2]
+    DMux(in=in, sel=sel[2], a=abcd, b=efgh);
+
+    // Second level: Split the abcd group based on sel[1]
+    DMux(in=abcd, sel=sel[1], a=ab, b=cd);
+    
+    // Second level: Split the efgh group based on sel[1]
+    DMux(in=efgh, sel=sel[1], a=ef, b=gh);
+
+    // Third level: Split the ab group based on sel[0]
+    DMux(in=ab, sel=sel[0], a=a, b=b);
+
+    // Third level: Split the cd group based on sel[0]
+    DMux(in=cd, sel=sel[0], a=c, b=d);
+
+    // Third level: Split the ef group based on sel[0]
+    DMux(in=ef, sel=sel[0], a=e, b=f);
+
+    // Third level: Split the gh group based on sel[0]
+    DMux(in=gh, sel=sel[0], a=g, b=h);
+}
+
+@SP
+A=A-1
+D=M
+A=A-1
+M=D-M
+D=A
+@SP
+M=D+1

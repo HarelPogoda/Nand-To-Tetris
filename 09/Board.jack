@@ -1,0 +1,368 @@
+// This file is part of nand2tetris, as taught in The Hebrew University, and
+// was written by Aviv Yaish. It is an extension to the specifications given
+// [here](https://www.nand2tetris.org) (Shimon Schocken and Noam Nisan, 2017),
+// as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
+// Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
+
+/**
+  * In Jack programs, the first function that runs is always the function "main"
+  * from the class "Main".
+  * You can include as many classes and functions as you want.
+  */
+class Board{
+field Car car1;
+field Car car2;
+field Car car3;
+field Car car4;
+field Car car5;
+field Car car6;
+field Array cars;
+field int exit_x;
+field int exit_y;
+field int board_length;
+
+field int memAddress;
+
+constructor Board new(int board_game){
+  let exit_x = 8;
+  let exit_y = 3;
+  let board_length = 8;
+  let cars = Array.new(6);
+  if (board_game = 1){
+    do game_1();
+    }
+  if (board_game = 2){
+    do game_2();
+    }
+  if (board_game = 3){
+    do game_3();
+    }
+
+  return this;
+  
+}
+
+/** option to games. */
+method void game_1(){
+    var Car x;
+    let x = Car.new(0,3,3,"H",1);
+    let car1 = x;
+    let car2 = Car.new(3,0,4,"H",2);
+    let car3 = Car.new(5,1,3,"H",3);
+    let car4 = Car.new(3,7,4,"H",4);
+    let car5 = Car.new(3,1,3,"V",5);
+    let car6 = Car.new(6,3,4,"V",6);
+    let cars[0] = car1;
+    let cars[1] = car2;
+    let cars[2] = car3;
+    let cars[3] = car4;
+    let cars[4] = car5;
+    let cars[5] = car6;
+
+return;
+}
+
+method void game_2(){
+    let car1 = Car.new(3,3,3,"H",1);
+    let car2 = Car.new(3,6,4,"H",2);
+    let car3 = Car.new(6,7,2,"H",3);
+    let car4 = Car.new(7,2,2,"V",4);
+    let car5 = Car.new(6,0,4,"V",5);
+    let car6 = Car.new(2,2,3,"V",6);
+    let cars[0] = car1;
+    let cars[1] = car2;
+    let cars[2] = car3;
+    let cars[3] = car4;
+    let cars[4] = car5;
+    let cars[5] = car6;
+return;
+}
+
+method void game_3(){
+    let car1 = Car.new(0,3,3,"H",1);
+    let car2 = Car.new(2,2,2,"H",2);
+    let car3 = Car.new(3,3,3,"V",3);
+    let car4 = Car.new(4,0,4,"V",4);
+    let car5 = Car.new(6,0,4,"V",5);
+    let car6 = Car.new(7,2,3,"V",6);
+    let cars[0] = car1;
+    let cars[1] = car2;
+    let cars[2] = car3;
+    let cars[3] = car4;
+    let cars[4] = car5;
+    let cars[5] = car6;
+return;
+}
+
+/** return 0 if the index is not in the board and 1 else. */
+method int index_in_board(int x, int y){
+
+if (x = exit_x) {
+    if (y = exit_y) {
+        return 1;
+    }
+    return 0;
+}
+
+  if (x < 0){
+  return 0;}
+  if (x > board_length - 1){
+  return 0;}
+  if (y < 0){
+  return 0;}
+  if (x > board_length - 1){
+  return 0;}
+  return 1;
+}
+
+/** return 0 if the index is not availble and 1 else. */
+method int is_index_availble(int x, int y){
+var Array x_arr;
+var Array y_arr;
+var int i;
+let x_arr = car1.get_arr_x();
+let y_arr = car1.get_arr_y();
+let i = 0;
+while (i < car1.get_size()){
+  if (((x_arr[i]) = x) & ((y_arr[i]) = y)){
+  return 0;
+  }
+let i = i + 1;
+}
+
+let x_arr = car2.get_arr_x();
+let y_arr = car2.get_arr_y();
+let i = 0;
+while (i < car2.get_size()){
+  if (((x_arr[i]) = x) & ((y_arr[i]) = y)){
+  return 0;
+  }
+let i = i + 1;
+}
+
+let x_arr = car3.get_arr_x();
+let y_arr = car3.get_arr_y();
+let i = 0;
+while (i < car3.get_size()){
+  if (((x_arr[i]) = x) & ((y_arr[i]) = y)){
+  return 0;
+  }
+let i = i + 1;
+}
+
+let x_arr = car4.get_arr_x();
+let y_arr = car4.get_arr_y();
+let i = 0;
+while (i < car4.get_size()){
+  if (((x_arr[i]) = x) & ((y_arr[i]) = y)){
+  return 0;
+  }
+let i = i + 1;
+}
+
+let x_arr = car5.get_arr_x();
+let y_arr = car5.get_arr_y();
+let i = 0;
+while (i < car5.get_size()){
+  if (((x_arr[i]) = x) & ((y_arr[i]) = y)){
+  return 0;
+  }
+let i = i + 1;
+}
+
+let x_arr = car6.get_arr_x();
+let y_arr = car6.get_arr_y();
+let i = 0;
+while (i < car6.get_size()){
+  if (((x_arr[i]) = x) & ((y_arr[i]) = y)){
+  return 0;
+  }
+let i = i + 1;
+}
+return 1;
+}
+
+method void draw_top_left(int location) {
+	let memAddress = location;
+	do Memory.poke(memAddress+0, -1);
+	do Memory.poke(memAddress+32, 1);
+	do Memory.poke(memAddress+64, 1);
+	do Memory.poke(memAddress+96, 1);
+	do Memory.poke(memAddress+128, 1);
+	do Memory.poke(memAddress+160, 1);
+	do Memory.poke(memAddress+192, 1);
+	do Memory.poke(memAddress+224, 1);
+	do Memory.poke(memAddress+256, 1);
+	do Memory.poke(memAddress+288, 1);
+	do Memory.poke(memAddress+320, 1);
+	do Memory.poke(memAddress+352, 1);
+	do Memory.poke(memAddress+384, 1);
+	do Memory.poke(memAddress+416, 1);
+	do Memory.poke(memAddress+448, 1);
+	do Memory.poke(memAddress+480, 1);
+	return;
+}
+
+method void draw_top_right(int location) {
+	let memAddress = location;
+	do Memory.poke(memAddress+0, -1);
+	do Memory.poke(memAddress+32, -32768);
+	do Memory.poke(memAddress+64, -32768);
+	do Memory.poke(memAddress+96, -32768);
+	do Memory.poke(memAddress+128, -32768);
+	do Memory.poke(memAddress+160, -32768);
+	do Memory.poke(memAddress+192, -32768);
+	do Memory.poke(memAddress+224, -32768);
+	do Memory.poke(memAddress+256, -32768);
+	do Memory.poke(memAddress+288, -32768);
+	do Memory.poke(memAddress+320, -32768);
+	do Memory.poke(memAddress+352, -32768);
+	do Memory.poke(memAddress+384, -32768);
+	do Memory.poke(memAddress+416, -32768);
+	do Memory.poke(memAddress+448, -32768);
+	do Memory.poke(memAddress+480, -32768);
+	return;
+}
+
+method void draw_bottom_right(int location) {
+	let memAddress = location;
+	do Memory.poke(memAddress+0, -32768);
+	do Memory.poke(memAddress+32, -32768);
+	do Memory.poke(memAddress+64, -32768);
+	do Memory.poke(memAddress+96, -32768);
+	do Memory.poke(memAddress+128, -32768);
+	do Memory.poke(memAddress+160, -32768);
+	do Memory.poke(memAddress+192, -32768);
+	do Memory.poke(memAddress+224, -32768);
+	do Memory.poke(memAddress+256, -32768);
+	do Memory.poke(memAddress+288, -32768);
+	do Memory.poke(memAddress+320, -32768);
+	do Memory.poke(memAddress+352, -32768);
+	do Memory.poke(memAddress+384, -32768);
+	do Memory.poke(memAddress+416, -32768);
+	do Memory.poke(memAddress+448, -32768);
+	do Memory.poke(memAddress+480, -1);
+	return;
+}
+
+method void draw_bottom_left(int location) {
+	let memAddress = location;
+	do Memory.poke(memAddress+0, 1);
+	do Memory.poke(memAddress+32, 1);
+	do Memory.poke(memAddress+64, 1);
+	do Memory.poke(memAddress+96, 1);
+	do Memory.poke(memAddress+128, 1);
+	do Memory.poke(memAddress+160, 1);
+	do Memory.poke(memAddress+192, 1);
+	do Memory.poke(memAddress+224, 1);
+	do Memory.poke(memAddress+256, 1);
+	do Memory.poke(memAddress+288, 1);
+	do Memory.poke(memAddress+320, 1);
+	do Memory.poke(memAddress+352, 1);
+	do Memory.poke(memAddress+384, 1);
+	do Memory.poke(memAddress+416, 1);
+	do Memory.poke(memAddress+448, 1);
+	do Memory.poke(memAddress+480, -1);
+	return;
+}
+
+
+
+method void draw_big_board_square(int x, int y){
+var int num_memory;
+var int i;
+let num_memory = Car.change_index_to_memory();
+do draw_top_left(num_memory);
+do draw_top_right(num_memory + 1);
+let i = Math.multiply(16,32) ;
+do draw_bottom_left(num_memory + i);
+do draw_bottom_right(num_memory + i + 1);
+return;
+}
+
+method void draw_the_board(){
+ var int j;
+ var int i;
+ let i = 0;
+ while (i<length()){
+  let j = 0;
+  while (j<this.length()){
+    do draw_big_board_square(j,i);
+    let j = j + 1;
+    }
+    let i = i + 1;
+    }
+  do draw_big_board_square (exit_x,exit_y);
+  return;
+  }
+  
+method void dispose() {
+      do car1.dispose();
+      do car2.dispose();
+      do car3.dispose();
+      do car4.dispose();
+      do car5.dispose();
+      do car6.dispose();
+      do cars.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+method Array next_index(char num_car, char direction){
+var Array tuple_result;
+var int size_car;
+var int int_num;
+let int_num = num_car - 48 - 1; /**אח שלי זה צאררר*/
+
+let size_car= cars[int_num].get_size();
+let tuple_result = Array.new(2);
+/**right. */
+if (direction = 132){
+  let tuple_result[0] = this.cars[int_num].get_arr_x[size_car-1] + 1;
+  let tuple_result[1] = this.cars[int_num].get_arr_y[size_car-1];
+  }
+  /**left. */
+if (direction = 130){
+  let tuple_result[0] = this.cars[int_num].get_arr_x[0] - 1;
+  let tuple_result[1] = this.cars[int_num].get_arr_y[0];
+}
+
+/**up. */
+if (direction == 130){
+  let tuple_result[0] = this.cars[int_num].get_arr_x[0] - 1;
+  let tuple_result[1] = this.cars[int_num].get_arr_y[0];
+}
+
+/**down. */
+if (direction = 133){
+  let tuple_result[0] = this.cars[int_num].get_arr_x[size_car-1];
+  let tuple_result[1] = this.cars[int_num].get_arr_y[size_car-1]+1;
+}
+return tuple_result; 
+}
+
+method int direct_match_car(char num_car, char direction){
+  var int int_num;
+  var char H_V;
+  let int_num = num_car - 48 - 1; /** מזיין תמוח עם צארים*.
+  let H_V = cars[int_num].get_direction();
+  if ((H_V == 'V' & direction == 131) | (H_V == 'V' & direction == 133) | (H_V == 'H' & direction == 132) | (H_V == 'H' & direction == 130) ){
+  return 1;
+  }
+  return 0;
+}
+
+method void change_board(char num_car, char direction){
+var int int_num;
+let int_num = num_car - 48 - 1;
+do this.cars[int_num].move_car(direction);
+return;
+}
+
+
+
+
+
+}/**end of class*/
+
+

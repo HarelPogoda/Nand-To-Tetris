@@ -1,0 +1,121 @@
+// This file is part of nand2tetris, as taught in The Hebrew University, and
+// was written by Aviv Yaish. It is an extension to the specifications given
+// [here](https://www.nand2tetris.org) (Shimon Schocken and Noam Nisan, 2017),
+// as allowed by the Creative Common Attribution-NonCommercial-ShareAlike 3.0
+// Unported [License](https://creativecommons.org/licenses/by-nc-sa/3.0/).
+
+// This chip is an extension of the regular CPU that uses the extended ALU.
+// If instruction[15]==0 or (instruction[14]==1 and instruction[13]==1),
+// then CpuMul behaves exactly the same as the regular CPU.
+// If instruction[15]==1 and instruction[14]==0 the chip will behave as follows:
+// | Instruction           | 15 | 14 | 13 | a | c1 | c2 | c3 | c4 | c5 | c6 |
+// |-----------------------|:--:|:--:|:--:|:-:|:--:|:--:|:--:|:--:|:--:|:--:|
+// | Regular a-instruction |  0 |  * |  * | * |  * |  * |  * |  * |  * |  * |
+// | Regular c-instruction |  1 |  1 |  1 | * |  * |  * |  * |  * |  * |  * |
+// | dest=A<<;jump         |  1 |  0 |  1 | 0 |  1 |  0 |  0 |  0 |  0 |  0 |
+// | dest=D<<;jump         |  1 |  0 |  1 | 0 |  1 |  1 |  0 |  0 |  0 |  0 |
+// | dest=M<<;jump         |  1 |  0 |  1 | 1 |  1 |  0 |  0 |  0 |  0 |  0 |
+// | dest=A>>;jump         |  1 |  0 |  1 | 0 |  0 |  0 |  0 |  0 |  0 |  0 |
+// | dest=D>>;jump         |  1 |  0 |  1 | 0 |  0 |  1 |  0 |  0 |  0 |  0 |
+// | dest=M>>;jump         |  1 |  0 |  1 | 1 |  0 |  0 |  0 |  0 |  0 |  0 |
+// Where:
+// - "<<" is a left shift, and ">>" is a right shift, as defined in project 2.
+//   These notations were chosen because they are used in real programming
+//   languages.
+// - dest and jump can take the same values as in the regular CPU.
+
+CHIP CpuMul {
+    IN  
+        inM[16],         // M value input (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Reset signal
+    OUT 
+        outM[16],        // M value output
+        writeM,          // Write to M?
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // Address of next instruction
+
+    PARTS:
+
+    Not(in=instruction[14], out=NotCInstruction);
+    And(a=instruction[15], b=NotCInstruction, out=NotRegularInstruction);
+    And(a=instruction[15], b=instruction[14], out=CInstruction);
+
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=MuxOut);
+
+    // A Register Logic
+    Not(in= instruction[15], out= NotInstruction15); // A => instruction[15] == 0
+    And(a=instruction[5], b= instruction[15], out= loadC);
+    Or(a=NotInstruction15, b= loadC, out=loadB);
+
+    Not(in=instruction[10], out=NotD);
+    Not(in=instruction[12], out=NotM);
+    And(a=NotD, b=NotM, out=NotDorM);
+
+    And(a=NotRegularInstruction, b=NotDorM, out=LoadShiftedA);
+    Or(a=loadB, b=LoadShiftedA, out=loadA);
+
+    ARegister(in=MuxOut, load=loadA, out= aOut);
+
+    // Address aOuts to RAM: Lower 15 bits of A register
+    Or16(a=aOut, b=false, out[0..14]=addressM);
+
+    // D Register Logic
+    And(a=CInstruction, b=instruction[4], out=LoadDTheRegularWay); // Load D if C-instruction and destination D
+
+    And(a=NotRegularInstruction, b=instruction[10], out=LoadShiftedD);
+    Or(a=LoadDTheRegularWay, b=LoadShiftedD, out=loadD);
+
+    DRegister(in=aluOut, load=loadD, out=dOut);
+
+    // ALU Input Selection
+    Mux16(a=aOut, b=inM, sel=instruction[12], out=aluYInput); // Select A or M as second input to ALU
+
+    // ExtendAlu Logic
+    ExtendAlu(
+        x=dOut,
+        y=aluYInput,
+        instruction=instruction[6..14],
+        out=aluOut, zr=zr, ng=ng
+    );
+
+
+    // writeM Signal
+    And(a=CInstruction, b=instruction[3], out=writeMTheRegularWay); // Write to M if C-instruction and destination M
+
+    And(a=NotRegularInstruction, b=instruction[12], out=LoadShiftedM);
+
+    Or(a=writeMTheRegularWay, b=LoadShiftedM, out=writeM);
+    // Output to RAM
+    Or16(a=false, b=aluOut, out=outM);
+
+    // Negate zr and ng for JGT
+    Not(in=zr, out=notZR);
+    Not(in=ng, out=notNG);
+    And(a=instruction[0], b=notZR, out=tempJGT1); // JGT: jump if greater than 0
+    And(a=tempJGT1, b=notNG, out=JGT);
+
+    //Compute JEQ
+    And(a=instruction[1], b=zr, out=JEQ); // JEQ: jump if equal to 0
+
+    //Compute JLT
+    And(a=instruction[2], b=ng, out=JLT); // JLT: jump if less than 0
+
+    // Combine JGT, JEQ, JLT
+    Or(a=JGT, b=JEQ, out=tempJump1);
+    Or(a=tempJump1, b=JLT, out=jumpCondition);
+
+    // Final Jump Signal (AND with instruction[15])
+    And(a=jumpCondition, b=instruction[15], out=jump);
+
+    // Program Counter Logic
+    Or(a=jump, b=reset, out=pcLoad); // Load PC if reset or jump condition
+    ShiftLeft(in=aOut, out=ShiftedALeft);
+    ShiftRight(in=aOut, out=ShiftedARight);
+    Mux16(a=ShiftedARight, b=ShiftedALeft, sel=instruction[11], out=AButShifted);
+
+    And(a=NotRegularInstruction, b=loadA, out=EarlyJumpNeeded);
+    Mux16(a=aOut, b=AButShifted, sel=EarlyJumpNeeded, out=RealAOut);
+    PC(in=RealAOut, load=pcLoad, inc=true, reset=reset, out=pcFull); // PC chip
+    Mux16(a=pcFull, b=false, sel=false, out[0..14]=pc); // Adjust PC to 15 bits
+}

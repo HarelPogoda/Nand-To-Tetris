@@ -1,0 +1,9 @@
+
+CHIP CheckNegative{
+    IN in[16];
+    OUT out;
+    PARTS:
+    // Put your code here:
+        Not(in= in[15], out= yup);
+        Not(in= yup, out= out);
+}
